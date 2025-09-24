@@ -1,4 +1,4 @@
-def main(input: str):
+def main(input: str) -> None:
     """
     Hi from main's doc string
     """

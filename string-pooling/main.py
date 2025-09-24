@@ -2,14 +2,14 @@ import random
 import string
 import sys
 
-def constants():
+def constants() -> None:
     left = "pooled"
     right = "pooled"
     
     print("(Compile time) Constant strings are pooled")
     check_identity(left, right)
 
-def dynamic():
+def dynamic() -> None:
     random_value = random.randint(10, 100)
     left = str(random_value)
     right = str(random_value)
@@ -17,7 +17,7 @@ def dynamic():
     print("(Run time) Dynamic strings are not pooled, with an exception")
     check_identity(left, right)
 
-def dynamic_exception_length():
+def dynamic_exception_length() -> None:
     random_string = ''.join(random.choice(string.ascii_letters))
     left = str(random_string)
     right = str(random_string)
@@ -25,14 +25,14 @@ def dynamic_exception_length():
     print("(Run time) Dynamic strings are pooled unless if the length of the string is 1")
     check_identity(left, right)
 
-def dynamic_exception_creation():
+def dynamic_exception_creation() -> None:
     left =''.join(random.choice(string.ascii_letters) for _ in range(random.randint(2, 10)))
     right = str(left)
     
     print("If we try to construct a string, with a string, it will just return the original string")
     check_identity(left, right)
 
-def interning():
+def interning() -> None:
     random_value = random.randint(10, 100)
 
     left = str(random_value)
@@ -44,7 +44,7 @@ def interning():
     check_identity(left, right)
 
 
-def check_identity(left: str, right: str):
+def check_identity(left: str, right: str) -> None:
     print(f"""
             left  = {left} (id: {id(left)})
             right = {right} (id: {id(right)})

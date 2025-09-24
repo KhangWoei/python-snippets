@@ -3,7 +3,7 @@ package_var = "I was defined at the package level"
 print("Doing some setup...")
 
 
-def main(input: str):
+def main(input: str) -> None:
     print("Simple package: {0}".format(input))
 
 """

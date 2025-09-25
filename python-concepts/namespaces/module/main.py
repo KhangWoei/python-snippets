@@ -1,9 +1,11 @@
+variable = "sub_module"
+
 def scopes():
     def local_scope():
         """
         In the local scope variables areread-only, attempting to write to them will create a new local variable in this scope.
         """
-        variable = "local"
+        variable = "sub_module_local"
         print(f"During local assignment: {variable}")
 
     def nonlocal_scope():
@@ -11,7 +13,7 @@ def scopes():
         The nonlocal keyword tells python to bind to the variables foun doutside of the local scope.
         """
         nonlocal variable
-        variable = "nonlocal"
+        variable = "sub_module_nonlocal"
         print(f"During non local assignment: {variable}")
 
     def global_scope():
@@ -19,10 +21,10 @@ def scopes():
         The global keyword tells python to bind to the outermost scope which is the module's namespace.
         """
         global variable 
-        variable = "global"
+        variable = "sub_module_global"
         print(f"During global assignment: {variable}")
     
-    variable = "function"
+    variable = "sub_module_function"
     print(f"Function initi: {variable}")
 
     local_scope()
@@ -33,26 +35,3 @@ def scopes():
 
     global_scope()
     print(f"After global assignment: {variable}")
-
-if __name__ == "__main__":
-    import module.main as m
-    import module.scopes as s
-    variable = "module"
-    print(f"Module init: {variable}")
-
-    scopes()
-    print(f"Global scope: {variable}")
-    
-    print(f"(Module) Sub module init: {m.variable}")
-    m.scopes()
-
-    print(f"Before class init: {variable}")
-    print(f"(Module) Before class: {m.variable}")
-    print(f"(Scopes module) Before class: {s.variable}")
-    scopes = s.Scopes()
-    scopes.scopes()
-    print(f"After class: {variable}")
-    print(f"(Module) After class: {m.variable}")
-    print(f"(Scopes module) After class: {s.variable}")
-
-

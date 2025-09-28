@@ -11,6 +11,6 @@ class Message(IRenderable):
         super().__init__
 
     def get_content(self) -> Content:
-        content = f"{self._sender}@{self._room}:"
+        content = f"{self._sender}@{self._room}:{self._message}"
         return Content(content, ContentType.MESSAGE)
 

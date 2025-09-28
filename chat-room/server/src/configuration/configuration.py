@@ -12,12 +12,12 @@ class _Configuration:
             self._initialized = True
     
     @property
-    def address(self):
+    def address(self) -> str:
         return self._config["Server"]["Address"]
 
     @property
-    def port(self):
-        return self._config["Server"]["Port"]
+    def port(self) -> int:
+        return int(self._config["Server"]["Port"])
 
 def load() -> _Configuration:    
     config_path = environ.get("CHAT_SERVER_CONFIGURATION", "config.ini")

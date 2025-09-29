@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "build-systems"
+requires-python = ">=3.8"
+description = "messing around with hatch"
+dependencies = []
+dynamic = ["version", "authors", "license"]
+
+[project.scripts]
+my_application = "core.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/core"]
+
+[tool.hatch.metadata.hooks.custom]
+path = "metadata.py"
+

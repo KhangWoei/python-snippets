@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import core as c
 
 def test_main_poops(capfd):

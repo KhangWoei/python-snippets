@@ -1,4 +1,4 @@
-import core as c
+import core.main as c
 
 def test_main_poops(capfd):
     c.main()

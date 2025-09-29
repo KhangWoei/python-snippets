@@ -13,22 +13,20 @@ dynamic = ["version", "authors", "license"]
 my_application = "core.main:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/core"]
+packages = ["core"]
+
+[tool.hatch.build.targets.wheel.source]
+"core" = "core"
 
 [tool.hatch.metadata.hooks.custom]
 path = "metadata.py"
 
-[tool.hatch.envs.tests]
+[tool.hatch.envs.test]
 template = "default"
 dependencies = [
     "pytest"
 ]
 
-[tool.hatch.env.tests.scripts]
-run = "pytest {args:tests}"
-
-[pytest]
-testpaths = core.tests
-
-
+[tool.hatch.env.test.scripts]
+run = "pytest"
 

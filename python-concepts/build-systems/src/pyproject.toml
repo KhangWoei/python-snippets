@@ -18,3 +18,12 @@ packages = ["src/core"]
 [tool.hatch.metadata.hooks.custom]
 path = "metadata.py"
 
+[tool.hatch.envs.tests]
+template = "default"
+dependencies = [
+    "pytest"
+]
+
+[tool.hatch.env.tests.scripts]
+run = "pytest {args:tests}"
+

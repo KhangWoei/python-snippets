@@ -27,3 +27,8 @@ dependencies = [
 [tool.hatch.env.tests.scripts]
 run = "pytest {args:tests}"
 
+[pytest]
+testpaths = core.tests
+
+
+

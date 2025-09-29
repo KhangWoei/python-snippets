@@ -1,12 +1,25 @@
 import socket 
+import signal
+import sys
 
 if __name__ == "__main__":
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     client.connect(("0.0.0.0", 9999))
 
-    client.send("hello!".encode())
+    def cleanup(sig, frame):
+        print("shutting down..")
+        client.shutdown(socket.SHUT_RDWR)
+        client.close()
+        sys.exit(0)
 
-    response = client.recv(4096)
-    print(response.decode())
+    signal.signal(signal.SIGTERM, cleanup)
+    signal.signal(signal.SIGINT, cleanup)
+
+    while True:
+        message = input()
+        client.send(message.encode())
+
+        response = client.recv(4096)
+        print(response.decode())
 

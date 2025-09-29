@@ -27,6 +27,6 @@ dependencies = [
     "pytest"
 ]
 
-[tool.hatch.env.test.scripts]
+[tool.hatch.envs.test.scripts]
 run = "pytest"
 

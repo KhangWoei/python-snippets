@@ -49,7 +49,11 @@ class Server():
                         if data:
                             print(f"[{current_client.address}, {current_client.socket.fileno()}]: {data}")
                             current_client.socket.send("Received".encode())
-                        
+                        else:
+                            print("Un-registering client...")
+                            del self._clients[file_descriptor]
+                            file_descriptors.unregister(current_client.socket.fileno())
+                            current_client.socket.close()
         finally:
             server.close()
             sys.exit(0)

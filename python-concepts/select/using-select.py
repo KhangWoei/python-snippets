@@ -23,6 +23,7 @@ def main() -> None:
     sockets: List[socket] = [socket1, socket2]
 
     while True:
+        print("Polling...")
         readers, _, _= select(sockets, [], [])
         
         for reader in readers:

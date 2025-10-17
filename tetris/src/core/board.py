@@ -43,7 +43,7 @@ class Board():
                 if not self._would_collide(self._current_piece, offset_x=-1):
                     self._current_piece.x -= 1
             case Moves.RIGHT:
-                if not self._would_collide(self._current_piece, offset_x=-1):
+                if not self._would_collide(self._current_piece, offset_x=1):
                     self._current_piece.x += 1
             case Moves.DROP:
                 if not self._would_collide(self._current_piece, offset_y=1):

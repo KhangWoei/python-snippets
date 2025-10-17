@@ -39,7 +39,9 @@ class Board():
     def move(self, move: Moves) -> None:
         match move:
             case Moves.ROTATE:
-                pass
+                self._current_piece.rotate_clockwise()
+                if self._would_collide(self._current_piece) != CollisionType.NONE:
+                    self._current_piece.rotate_counter_clockwise()
             case Moves.LEFT:
                 self._handle_collision(
                     self._would_collide(self._current_piece, offset_x=-1),

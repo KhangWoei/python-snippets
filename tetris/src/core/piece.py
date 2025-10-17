@@ -11,7 +11,7 @@ class Piece(ABC):
     @property
     def x(self) -> int:
         return self._x
-    
+
     @x.setter
     def x(self, value: int) -> None:
         self._x = value
@@ -19,7 +19,7 @@ class Piece(ABC):
     @property
     def y(self) -> int:
         return self._y
-    
+
     @y.setter
     def y(self, value: int) -> None:
         self._y = value
@@ -27,6 +27,12 @@ class Piece(ABC):
     @property
     def shape(self) -> List[List[int]]:
         return self._shape
+
+    def rotate_clockwise(self) -> None:
+        self._shape = [list(row) for row in zip(*self._shape[::-1])]
+
+    def rotate_counter_clockwise(self) -> None:
+        self._shape = [list(row) for row in zip(*self._shape)][::-1]
 
 class IPiece(Piece):
     def __init__(self, y: int = 0, x: int =0) -> None:

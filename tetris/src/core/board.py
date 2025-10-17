@@ -1,6 +1,6 @@
 from curses import window, newwin
 from .block_size import BlockSize
-from typing import List
+from typing import List, Callable, Optional
 from .piece import Piece, RandomPieceFactory
 from enum import Enum
 
@@ -9,6 +9,11 @@ class Moves(Enum):
     LEFT = 2
     RIGHT = 3
     DROP = 4
+
+class CollisionType(Enum):
+    NONE = 0
+    LOCK = 1
+    BOUNDARY = 2
 
 class Board():
     _board_height = 20
@@ -25,7 +30,7 @@ class Board():
         self._block_size: BlockSize = block_size
 
         self._board: List[List[int]] = [[0 for _ in range(self._board_width)] for _ in range(self._board_height)]
-        self._current_piece: Piece = RandomPieceFactory.create(0, self._board_width // 2)
+        self._spawn_new_piece()
 
     @property
     def window(self) -> window:
@@ -36,17 +41,54 @@ class Board():
             case Moves.ROTATE:
                 pass
             case Moves.LEFT:
-                self._current_piece.x -= 1
-                pass
+                self._handle_collision(
+                    self._would_collide(self._current_piece, offset_x=-1),
+                    transform=lambda: setattr(self._current_piece, 'x', self._current_piece.x - 1)
+                )
             case Moves.RIGHT:
-                self._current_piece.x += 1
-                pass
+                self._handle_collision(
+                    self._would_collide(self._current_piece, offset_x=1),
+                    transform=lambda: setattr(self._current_piece, 'x', self._current_piece.x + 1)
+                )
             case Moves.DROP:
-                self._current_piece.y += 1
-                pass
+                self._handle_collision(
+                    self._would_collide(self._current_piece, offset_y=1),
+                    transform=lambda: setattr(self._current_piece, 'y', self._current_piece.y + 1)
+                )
             case _:
                 pass
-                
+
+    def _handle_collision(
+        self,
+        collision: CollisionType,
+        transform: Callable[[], None]
+    ) -> None:
+        match collision:
+            case CollisionType.NONE:
+                    transform()
+            case CollisionType.BOUNDARY:
+                pass
+            case CollisionType.LOCK:
+                self._lock_piece()
+                self._spawn_new_piece()
+
+    def _would_collide(self, piece: Piece, offset_y: int = 0, offset_x: int = 0) -> CollisionType:
+        if offset_y == 0 and offset_x == 0:
+            return CollisionType.NONE
+
+        for y, row in enumerate(piece.shape):
+            for x, cell in enumerate(row):
+                if cell != 0:
+                    new_y = piece.y + y + offset_y
+                    new_x = piece.x + x + offset_x
+
+                    if (new_x < 0 or new_x >= self._board_width) or (new_y < 0):
+                        return CollisionType.BOUNDARY
+                    
+                    if (new_y >= self._board_height) or self._board[new_y][new_x] != 0:
+                        return CollisionType.LOCK
+        
+        return CollisionType.NONE 
 
     def render(self) -> None:
         self._window.erase()
@@ -74,3 +116,15 @@ class Board():
                     for height in range(self._block_size.height):
                         self.window.addstr(cell_y + height, cell_x, "[" + "x" * (self._block_size.width - 2) + "]")
 
+    def _lock_piece(self) -> None:
+        for y, row in enumerate(self._current_piece.shape):
+            for x, cell in enumerate(row):
+                if cell != 0:
+                    board_y = self._current_piece.y + y
+                    board_x = self._current_piece.x + x
+
+                    if 0 <= board_y < self._board_height and 0 <= board_x < self._board_width:
+                        self._board[board_y][board_x] = 1
+
+    def _spawn_new_piece(self) -> None:
+        self._current_piece = RandomPieceFactory.create(y=0, x=self._board_width // 2)

@@ -2,9 +2,9 @@ from curses import window, newwin
 from dataclasses import dataclass
 from .board import Board
 from .block_size import BlockSize
+from .border_decorator import BorderDecorator
 
 class Game():
-
     def __init__(self, drop_speed: float = 0.5, block_height: int = 2, block_width: int = 4):
         self._drop_speed = drop_speed
         
@@ -14,7 +14,9 @@ class Game():
         window.clear()
 
         board = Board(window, self._block_size)
-        while True:
+        border = BorderDecorator(window, board.window)
+        border.render()
 
-            pass
+        while True:
+            board.render()
 

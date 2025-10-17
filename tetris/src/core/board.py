@@ -8,15 +8,15 @@ class Board():
     def __init__(self, window: window, block_size: BlockSize) -> None:
         self._block_size = block_size
         max_height, max_width = window.getmaxyx()
-        
+
         mapped_height = self._board_height * block_size.height
         mapped_width = self._board_width * block_size.width
 
         start_y = (max_height - (mapped_height)) // 2
         start_x = (max_width - (mapped_width)) // 2
-        
+
         self._window = newwin(mapped_height + 1, mapped_width, start_y, start_x)
-        self._board = [[1 for _ in range(self._board_width)] for _ in range(self._board_height)]
+        self._board = [[0 for _ in range(self._board_width)] for _ in range(self._board_height)]
 
     @property
     def window(self) -> window:

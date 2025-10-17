@@ -2,6 +2,7 @@ from curses import window, newwin
 from .block_size import BlockSize
 from typing import List, Callable, Optional
 from .piece import Piece, RandomPieceFactory
+from .event_bus import EventBus, GameEvents
 from enum import Enum
 
 class Moves(Enum):
@@ -19,15 +20,16 @@ class Board():
     _board_height = 20
     _board_width = 10
 
-    def __init__(self, parent_window: window, block_size: BlockSize) -> None:
+    def __init__(self, parent_window: window, block_size: BlockSize, event_bus: EventBus) -> None:
         max_height, max_width = parent_window.getmaxyx()
         mapped_height: int = self._board_height * block_size.height
         mapped_width: int = self._board_width * block_size.width
         start_y: int = (max_height - (mapped_height)) // 2
         start_x: int = (max_width - (mapped_width)) // 2
         self._window: window = newwin(mapped_height + 1, mapped_width, start_y, start_x)
-        
+
         self._block_size: BlockSize = block_size
+        self._event_bus: EventBus = event_bus
 
         self._board: List[List[int]] = [[0 for _ in range(self._board_width)] for _ in range(self._board_height)]
         self._spawn_new_piece()
@@ -125,9 +127,11 @@ class Board():
                     if 0 <= board_y < self._board_height and 0 <= board_x < self._board_width:
                         self._board[board_y][board_x] = 1
 
+        # Check for line clear
+
     def _spawn_new_piece(self) -> None:
         self._current_piece = RandomPieceFactory.create(y=0, x=self._board_width // 2)
 
-        if (self._would_collide(self._current_piece, 0, 0) == CollisionType.BOUNDARY):
-            # This is game over
-            pass
+        if self._would_collide(self._current_piece) != CollisionType.NONE:
+            self._event_bus.emit(GameEvents.GAME_OVER)
+

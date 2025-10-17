@@ -76,6 +76,7 @@ class Board():
 
     def render(self) -> None:
         self._window.erase()
+        self._window.border()
         self._render_piece()
         self._render_cells()
         self._window.refresh()

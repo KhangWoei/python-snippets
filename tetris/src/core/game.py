@@ -8,7 +8,6 @@ from time import time
 class Game():
     def __init__(self, drop_speed: float = 0.5, block_height: int = 2, block_width: int = 4):
         self._drop_speed: float = drop_speed
-
         self._block_size: BlockSize = BlockSize(block_height, block_width)
         self._game_over: bool = False
         self._score: int = 0
@@ -23,8 +22,6 @@ class Game():
         game_window.clear()
 
         board: Board = Board(game_window, self._block_size, event_bus)
-        border: BorderDecorator = BorderDecorator(game_window, board.window)
-        border.render()
 
         score_window: window = self._create_score_window(board)
 

@@ -11,11 +11,6 @@ class Moves(Enum):
     RIGHT = 3
     DROP = 4
 
-class CollisionType(Enum):
-    NONE = 0
-    LOCK = 1
-    BOUNDARY = 2
-
 class Board():
     _board_height = 20
     _board_width = 10
@@ -42,54 +37,39 @@ class Board():
         match move:
             case Moves.ROTATE:
                 self._current_piece.rotate_clockwise()
-                if self._would_collide(self._current_piece) != CollisionType.NONE:
+                if self._would_collide(self._current_piece):
                     self._current_piece.rotate_counter_clockwise()
             case Moves.LEFT:
-                self._handle_collision(
-                    self._would_collide(self._current_piece, offset_x=-1),
-                    transform=lambda: setattr(self._current_piece, 'x', self._current_piece.x - 1)
-                )
+                if not self._would_collide(self._current_piece, offset_x=-1):
+                    self._current_piece.x -= 1
             case Moves.RIGHT:
-                self._handle_collision(
-                    self._would_collide(self._current_piece, offset_x=1),
-                    transform=lambda: setattr(self._current_piece, 'x', self._current_piece.x + 1)
-                )
+                if not self._would_collide(self._current_piece, offset_x=-1):
+                    self._current_piece.x += 1
             case Moves.DROP:
-                self._handle_collision(
-                    self._would_collide(self._current_piece, offset_y=1),
-                    transform=lambda: setattr(self._current_piece, 'y', self._current_piece.y + 1)
-                )
+                if not self._would_collide(self._current_piece, offset_y=1):
+                    self._current_piece.y += 1
+                else:
+                    self._lock_piece()
+                    self._spawn_new_piece()
+
             case _:
                 pass
 
-    def _handle_collision(
-        self,
-        collision: CollisionType,
-        transform: Callable[[], None]
-    ) -> None:
-        match collision:
-            case CollisionType.NONE:
-                    transform()
-            case CollisionType.BOUNDARY:
-                pass
-            case CollisionType.LOCK:
-                self._lock_piece()
-                self._spawn_new_piece()
-
-    def _would_collide(self, piece: Piece, offset_y: int = 0, offset_x: int = 0) -> CollisionType:
+    def _would_collide(self, piece: Piece, offset_y: int = 0, offset_x: int = 0) -> bool:
         for y, row in enumerate(piece.shape):
             for x, cell in enumerate(row):
                 if cell != 0:
                     new_y = piece.y + y + offset_y
                     new_x = piece.x + x + offset_x
 
-                    if (new_x < 0 or new_x >= self._board_width) or (new_y < 0):
-                        return CollisionType.BOUNDARY
-                    
-                    if (new_y >= self._board_height) or self._board[new_y][new_x] != 0:
-                        return CollisionType.LOCK
+                    if (new_x < 0 
+                        or new_x >= self._board_width 
+                        or new_y < 0 
+                        or new_y >= self._board_height 
+                        or self._board[new_y][new_x] != 0):
+                        return True
         
-        return CollisionType.NONE 
+        return False
 
     def render(self) -> None:
         self._window.erase()

@@ -39,6 +39,30 @@ class IPiece(Piece):
         super().__init__(y, x)
         self._shape = [[1, 1, 1, 1]]
 
+class JPiece(Piece):
+    def __init__(self, y: int = 0, x: int =0) -> None:
+        super().__init__(y, x)
+        self._shape = [
+            [1, 0, 0],
+            [1, 1, 1],
+        ]
+
+class LPiece(Piece):
+    def __init__(self, y: int = 0, x: int =0) -> None:
+        super().__init__(y, x)
+        self._shape = [
+            [1, 1, 1],
+            [1, 0, 0]
+        ]
+
+class OPiece(Piece):
+    def __init__(self, y: int = 0, x: int =0) -> None:
+        super().__init__(y, x)
+        self._shape = [
+            [1, 1],
+            [1, 1]
+        ]
+
 class TPiece(Piece):
     def __init__(self, y: int = 0, x: int =0) -> None:
         super().__init__(y, x)
@@ -47,8 +71,27 @@ class TPiece(Piece):
             [1, 1, 1]
         ]
 
+class SPiece(Piece):
+    def __init__(self, y: int = 0, x: int =0) -> None:
+        super().__init__(y, x)
+        self._shape = [
+            [1, 0],
+            [1, 1],
+            [0, 1],
+        ]
+
+class ZPiece(Piece):
+    def __init__(self, y: int = 0, x: int =0) -> None:
+        super().__init__(y, x)
+        self._shape = [
+            [0, 1],
+            [1, 1],
+            [1, 0],
+        ]
+
+
 class RandomPieceFactory:
-    _PIECES = [IPiece, TPiece]
+    _PIECES = [IPiece, JPiece, LPiece, OPiece, TPiece, SPiece, ZPiece]
 
     @staticmethod
     def create(y: int = 0, x: int = 0) -> Piece:

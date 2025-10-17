@@ -17,10 +17,12 @@ class Game:
 
         self._board = [[0 for _ in range(self._board_width)] for _ in range(self._board_height)]
 
+        self._game_over = False
+
     def start(self) -> None:
         self._window.clear()
 
-        while True:
+        while not self._game_over:
             self._draw_board()
     
     def _draw_board(self) -> None:

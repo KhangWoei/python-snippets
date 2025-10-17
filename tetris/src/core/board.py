@@ -1,6 +1,14 @@
 from curses import window, newwin
 from .block_size import BlockSize
 from typing import List
+from .piece import Piece, RandomPieceFactory
+from enum import Enum
+
+class Moves(Enum):
+    ROTATE = 1
+    LEFT = 2
+    RIGHT = 3
+    DROP = 4
 
 class Board():
     _board_height = 20
@@ -22,6 +30,23 @@ class Board():
     @property
     def window(self) -> window:
         return self._window
+
+    def move(self, move: Moves) -> None:
+        match move:
+            case Moves.ROTATE:
+                pass
+            case Moves.LEFT:
+                self._current_piece.x -= 1
+                pass
+            case Moves.RIGHT:
+                self._current_piece.x += 1
+                pass
+            case Moves.DROP:
+                self._current_piece.y += 1
+                pass
+            case _:
+                pass
+                
 
     def render(self) -> None:
         self._window.erase()

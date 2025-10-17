@@ -1,0 +1,9 @@
+{
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "name",
+            "email": "email@email.com"
+        }],
+    "license": "MIT"
+}

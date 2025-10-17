@@ -27,11 +27,13 @@ class Game:
 
         window.addstr(self._height - 2, 0, "+" + "-" * (self._width - 2) + "+")
 
-def main(window: curses.window) -> None:
-    curses.curs_set(0)
+def _start(window: curses.window) -> None:
     game = Game(window)
 
     game.start()
 
+def main() -> None:
+    curses.wrapper(_start)
+
 if __name__ == "__main__":
-    curses.wrapper(main)
+    main()

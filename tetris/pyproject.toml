@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tetris"
+requires-python = ">=3.12"
+description = "Tetris on the terminal"
+dynamic = ["version", "authors", "license"]
+
+[tool.hatch.metadata.hooks.custom]
+path = "metadata.py"
+
+[project.scripts]
+tetris = "core.main:main"
+
+[tool.hatch.envs.default.scripts]
+run = "tetris"
+
+[tool.hatch.envs.build]
+detatched = true
+
+[tool.hatch.envs.build.env-vars]
+PYAPP_DISTRIBUTION_EMBED = "true"
+PYAPP_UV_ENABLED = "true"
+PYAPP_PYTHON_VERSION = "3.12"
+
+[tool.hatch.envs.build.scripts]
+build = [
+    "hatch build -c -t wheel",
+    "export PYAPP_PROJECT_PATH=$(ls -t {root}/dist/*.whl | head -n 1)",
+    "hatch build -t binary"
+]
+
+[tool.hatch.build.targets.binary]
+scripts = ["tetris"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/core"]
+

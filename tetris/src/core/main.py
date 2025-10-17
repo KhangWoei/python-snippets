@@ -11,12 +11,12 @@ class Game:
         while True:
             self._draw_board()
     
-    def _draw_board(self):
+    def _draw_board(self) -> None:
         window = self._window
         self._draw_border()
         window.refresh()
 
-    def _draw_border(self):
+    def _draw_border(self) -> None:
         window = self._window
 
         window.addstr(0, 0, "+" + "-" * (self._width - 2) + "+")

@@ -2,7 +2,7 @@ from curses import window, newwin
 from .block_size import BlockSize
 from typing import List, Callable, Optional
 from .piece import Piece, RandomPieceFactory
-from .event_bus import EventBus, GameEvents
+from .event_bus import EventBus, GameEvents, BoardEvents
 from enum import Enum
 
 class Moves(Enum):
@@ -29,31 +29,34 @@ class Board():
         self._board: List[List[int]] = [[0 for _ in range(self._board_width)] for _ in range(self._board_height)]
         self._spawn_new_piece()
 
+        event_bus.subscribe(BoardEvents.ROTATE, self._handle_rotation) 
+        event_bus.subscribe(BoardEvents.LEFT, self._handle_move_left) 
+        event_bus.subscribe(BoardEvents.RIGHT, self._handle_move_right) 
+        event_bus.subscribe(BoardEvents.DROP, self._handle_drop) 
+
     @property
     def window(self) -> window:
         return self._window
+    
+    def _handle_rotation(self, **kwargs) -> None:
+        self._current_piece.rotate_clockwise()
+        if self._would_collide(self._current_piece):
+            self._current_piece.rotate_counter_clockwise()
+    
+    def _handle_move_left(self, **kwargs) -> None:
+        if not self._would_collide(self._current_piece, offset_x=-1):
+            self._current_piece.x -= 1
 
-    def move(self, move: Moves) -> None:
-        match move:
-            case Moves.ROTATE:
-                self._current_piece.rotate_clockwise()
-                if self._would_collide(self._current_piece):
-                    self._current_piece.rotate_counter_clockwise()
-            case Moves.LEFT:
-                if not self._would_collide(self._current_piece, offset_x=-1):
-                    self._current_piece.x -= 1
-            case Moves.RIGHT:
-                if not self._would_collide(self._current_piece, offset_x=1):
-                    self._current_piece.x += 1
-            case Moves.DROP:
-                if not self._would_collide(self._current_piece, offset_y=1):
-                    self._current_piece.y += 1
-                else:
-                    self._lock_piece()
-                    self._spawn_new_piece()
+    def _handle_move_right(self, **kwargs) -> None:
+        if not self._would_collide(self._current_piece, offset_x=1):
+            self._current_piece.x += 1
 
-            case _:
-                pass
+    def _handle_drop(self, **kwargs) -> None:
+        if not self._would_collide(self._current_piece, offset_y=1):
+            self._current_piece.y += 1
+        else:
+            self._lock_piece()
+            self._spawn_new_piece()
 
     def _would_collide(self, piece: Piece, offset_y: int = 0, offset_x: int = 0) -> bool:
         for y, row in enumerate(piece.shape):

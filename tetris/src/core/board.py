@@ -127,6 +127,6 @@ class Board():
     def _spawn_new_piece(self) -> None:
         self._current_piece = RandomPieceFactory.create(y=0, x=self._board_width // 2)
 
-        if self._would_collide(self._current_piece) != CollisionType.NONE:
+        if self._would_collide(self._current_piece):
             self._event_bus.emit(GameEvents.GAME_OVER)
 

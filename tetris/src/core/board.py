@@ -127,7 +127,22 @@ class Board():
                     if 0 <= board_y < self._board_height and 0 <= board_x < self._board_width:
                         self._board[board_y][board_x] = 1
 
-        # Check for line clear
+        self._clear()
+
+    def _clear(self) -> None:
+        lines_cleared = 0
+
+        y = self._board_height - 1
+        while y >= 0:
+            if all(self._board[y]):
+                del self._board[y]
+                self._board.insert(0, [0 for _ in range(self._board_width)])
+                lines_cleared += 1
+            else:
+                y -= 1
+
+        if lines_cleared > 0:
+            self._event_bus.emit(GameEvents.LINE_CLEARED, lines=lines_cleared)
 
     def _spawn_new_piece(self) -> None:
         self._current_piece = RandomPieceFactory.create(y=0, x=self._board_width // 2)

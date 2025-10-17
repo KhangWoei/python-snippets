@@ -49,3 +49,9 @@ class Game():
 
     def _handle_game_over(self, **kwargs):
         self._game_over = True
+
+    def _handle_line_clear(self, **kwargs):
+        lines: int | None = kwargs.get("lines")
+
+        if lines:
+            self._score += (lines * 100)

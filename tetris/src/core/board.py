@@ -73,9 +73,6 @@ class Board():
                 self._spawn_new_piece()
 
     def _would_collide(self, piece: Piece, offset_y: int = 0, offset_x: int = 0) -> CollisionType:
-        if offset_y == 0 and offset_x == 0:
-            return CollisionType.NONE
-
         for y, row in enumerate(piece.shape):
             for x, cell in enumerate(row):
                 if cell != 0:
@@ -128,3 +125,7 @@ class Board():
 
     def _spawn_new_piece(self) -> None:
         self._current_piece = RandomPieceFactory.create(y=0, x=self._board_width // 2)
+
+        if (self._would_collide(self._current_piece, 0, 0) == CollisionType.BOUNDARY):
+            # This is game over
+            pass

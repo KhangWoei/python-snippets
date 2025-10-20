@@ -68,12 +68,18 @@ class Server():
                     data: bytes = current_client.socket.recv(1024)
 
                     if data:
-                        print(f"[{current_client.address}, {current_client.socket.fileno()}]: {data}")
-                        current_client.socket.send("Received".encode())
+                        msg: str = f"[{current_client.address}, {current_client.socket.fileno()}]: {data}"
+                        print(msg)
+                        self._broadcast(msg)
                     else:
                         print("Un-registering client...")
                         del self._clients[file_descriptor]
                         file_descriptors.unregister(current_client.socket.fileno())
                         current_client.socket.close()
+    
+    def _broadcast(self, msg:str) -> None:
+        encoded_msg = msg.encode()
 
+        for fd, client in self._clients.items():
+            client.socket.send(encoded_msg)
 

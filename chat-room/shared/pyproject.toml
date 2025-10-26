@@ -1,0 +1,12 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kchat-shared"
+version = "0.1.0"
+requires-python = ">=3.12"
+description = "Shared data transfer objects for kchat client and server"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/message"]

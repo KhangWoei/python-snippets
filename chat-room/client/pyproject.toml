@@ -7,6 +7,12 @@ name = "kchat-client"
 requires-python = ">=3.12"
 description = "Chat server client"
 dynamic = ["version", "authors", "license"]
+dependencies = [
+    "kchat-shared @ {root:uri}/../shared",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.metadata.hooks.custom]
 path = "metadata.py"

@@ -17,3 +17,6 @@ hatch run <environment>:<script>
 ```
 hatch env show
 ```
+
+# On local deps
+https://github.com/pypa/hatch/discussions/225

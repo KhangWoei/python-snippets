@@ -47,8 +47,8 @@ class Server():
         file_descriptors.register(server, EVENT_READ)
 
         while True:
-            print("Polling ...??")
-            events: List[Tuple[SelectorKey, int]]  = file_descriptors.select()
+            print("Polling ...")
+            events: List[Tuple[SelectorKey, int]]  = file_descriptors.select(1)
 
             for key, _ in events:
                 if key.fd == server.fileno():

@@ -40,8 +40,8 @@ class Server():
 
     def start_server(self) -> None:
         server: socket = self._socket
+        server.listen()
 
-        server.listen(5)
         print(f"Listening on {server.getsockname()}")
         file_descriptors: DefaultSelector = self._selector
         file_descriptors.register(server, EVENT_READ)

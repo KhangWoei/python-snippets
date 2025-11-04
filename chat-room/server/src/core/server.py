@@ -1,4 +1,4 @@
-from socket import socket, AF_INET, SOCK_STREAM
+from socket import socket, AF_INET, SOCK_STREAM, SHUT_RDWR
 from types import TracebackType
 from typing import Dict, List, Tuple, Self
 from dataclasses import dataclass
@@ -21,8 +21,11 @@ class Server():
         return self
 
     def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
+        print("Cleaning up")
+
         for client in self._clients.values():
             try:
+                client.socket.shutdown(SHUT_RDWR);
                 client.socket.close()
             except:
                 pass
@@ -40,12 +43,11 @@ class Server():
 
         server.listen(5)
         print(f"Listening on {server.getsockname()}")
-
         file_descriptors: DefaultSelector = self._selector
-        file_descriptors.register(server.fileno(), EVENT_READ)
+        file_descriptors.register(server, EVENT_READ)
 
         while True:
-            print("Polling ...")
+            print("Polling ...??")
             events: List[Tuple[SelectorKey, int]]  = file_descriptors.select()
 
             for key, _ in events:
@@ -55,22 +57,21 @@ class Server():
                     addr: str
                     new_client, addr = server.accept()
                     self._clients[new_client.fileno()] = Client(new_client, addr)
-                    print(self._clients)                       
 
-                    file_descriptors.register(new_client.fileno(), EVENT_READ)
+                    file_descriptors.register(new_client, EVENT_READ)
                 else:
                     print("Client data received...")
                     current_client: Client = self._clients[key.fd]
                     data: bytes = current_client.socket.recv(1024)
 
                     if data:
-                        msg: str = f"[{current_client.address}, {current_client.socket.fileno()}]: {data}"
+                        msg: str = f"[{current_client.address}]: {data}"
                         print(msg)
                         self._broadcast(msg)
                     else:
                         print("Un-registering client...")
                         del self._clients[key.fd]
-                        file_descriptors.unregister(current_client.socket.fileno())
+                        file_descriptors.unregister(current_client.socket)
                         current_client.socket.close()
     
     def _broadcast(self, msg:str) -> None:

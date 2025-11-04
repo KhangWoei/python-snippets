@@ -6,9 +6,14 @@ from typing import List, TypeAlias
 _Level: TypeAlias = int | str
 
 class LogInitializer():
+
     @staticmethod
     def init(name: str, verbosity: _Level = INFO):
         base: Logger = getLogger(name)
+
+        if base.handlers:
+            return
+
         base.setLevel(verbosity)
 
         # https://docs.python.org/3/library/logging.html#logrecord-attributes
@@ -26,4 +31,3 @@ class LogInitializer():
             base.info(f"Logging to file: {log_file}")
         except (Exception) as e:
             base.error(f"Failed to setup file logging {e}. Falling back to console logger")
-

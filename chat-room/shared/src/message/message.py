@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import dataclasses
 from enum import Enum
 from json import JSONEncoder, JSONDecoder
@@ -9,7 +8,7 @@ class MessageType(Enum):
     ROOM = 2
     USER = 3
 
-@dataclass
+@dataclasses.dataclass
 class Message():
     type: MessageType;
     sender: str;

@@ -13,3 +13,13 @@ dependencies = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/message", "src/log_initializer"]
+
+[tool.hatch.envs.test]
+template = "default"
+dependencies = [
+    "pytest"
+]
+
+[tool.hatch.envs.test.scripts]
+run = "pytest"
+

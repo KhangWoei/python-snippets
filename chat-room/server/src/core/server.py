@@ -1,8 +1,8 @@
 from socket import socket, AF_INET, SOCK_STREAM
 from types import TracebackType
 from typing import Dict, List, Tuple, Self
-from select import epoll, EPOLLIN
 from dataclasses import dataclass
+from selectors import DefaultSelector, EVENT_READ, SelectorKey
 
 @dataclass
 class Client():
@@ -11,11 +11,11 @@ class Client():
 
 class Server():
 
-    def __init__(self, address: str, port: int):
+    def __init__(self, address: str, port: int) -> None:
         self._socket = socket(AF_INET, SOCK_STREAM)
         self._socket.bind((address, port))
         self._clients: Dict[int, Client] = {}
-        self._epoll: epoll = epoll()
+        self._selector: DefaultSelector = DefaultSelector()
 
     def __enter__(self) -> Self:
         return self
@@ -29,11 +29,7 @@ class Server():
         self._clients.clear()
 
         try:
-            self._epoll.close()
-        except:
-            pass
-
-        try:
+            self._selector.close()
             self._socket.close()
         except:
             pass
@@ -45,15 +41,15 @@ class Server():
         server.listen(5)
         print(f"Listening on {server.getsockname()}")
 
-        file_descriptors: epoll = self._epoll
-        file_descriptors.register(server.fileno(), EPOLLIN)
+        file_descriptors: DefaultSelector = self._selector
+        file_descriptors.register(server.fileno(), EVENT_READ)
 
         while True:
             print("Polling ...")
-            events: List[Tuple[int, int]]  = file_descriptors.poll()
+            events: List[Tuple[SelectorKey, int]]  = file_descriptors.select()
 
-            for file_descriptor, event in events:
-                if file_descriptor == server.fileno():
+            for key, _ in events:
+                if key.fd == server.fileno():
                     print("Registering client...")
                     new_client:socket 
                     addr: str
@@ -61,10 +57,10 @@ class Server():
                     self._clients[new_client.fileno()] = Client(new_client, addr)
                     print(self._clients)                       
 
-                    file_descriptors.register(new_client.fileno(), EPOLLIN)
+                    file_descriptors.register(new_client.fileno(), EVENT_READ)
                 else:
                     print("Client data received...")
-                    current_client: Client = self._clients[file_descriptor]
+                    current_client: Client = self._clients[key.fd]
                     data: bytes = current_client.socket.recv(1024)
 
                     if data:
@@ -73,7 +69,7 @@ class Server():
                         self._broadcast(msg)
                     else:
                         print("Un-registering client...")
-                        del self._clients[file_descriptor]
+                        del self._clients[key.fd]
                         file_descriptors.unregister(current_client.socket.fileno())
                         current_client.socket.close()
     

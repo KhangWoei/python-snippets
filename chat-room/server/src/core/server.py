@@ -3,6 +3,9 @@ from types import TracebackType
 from typing import Dict, List, Tuple, Self
 from dataclasses import dataclass
 from selectors import DefaultSelector, EVENT_READ, SelectorKey
+import logging
+
+logger = logging.getLogger(__name__)
 
 @dataclass
 class Client():
@@ -21,7 +24,7 @@ class Server():
         return self
 
     def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
-        print("Cleaning up")
+        logger.info("Cleaning up")
 
         for client in self._clients.values():
             try:
@@ -42,16 +45,16 @@ class Server():
         try:
             server: socket = self._socket
             server.listen()
-            print(f"Listening on {server.getsockname()}")
+            logger.info(f"Listening on {server.getsockname()}")
             file_descriptors: DefaultSelector = self._selector
             file_descriptors.register(server, EVENT_READ)
             while True:
-                print("Polling ...")
+                logger.info("Polling ...")
                 events: List[Tuple[SelectorKey, int]]  = file_descriptors.select(1)
 
                 for key, _ in events:
                     if key.fd == server.fileno():
-                        print("Registering client...")
+                        logger.info("Registering client...")
                         new_client:socket 
                         addr: str
                         new_client, addr = server.accept()
@@ -59,21 +62,21 @@ class Server():
 
                         file_descriptors.register(new_client, EVENT_READ)
                     else:
-                        print("Client data received...")
+                        logger.info("Client data received...")
                         current_client: Client = self._clients[key.fd]
                         data: bytes = current_client.socket.recv(1024)
 
                         if data:
                             msg: str = f"[{current_client.address}]: {data}"
-                            print(msg)
+                            logger.info(msg)
                             self._broadcast(msg)
                         else:
-                            print("Un-registering client...")
+                            logger.info("Un-registering client...")
                             del self._clients[key.fd]
                             file_descriptors.unregister(current_client.socket)
                             current_client.socket.close()
         except KeyboardInterrupt:
-            print("Shutting down")
+            logger.info("Shutting down")
     
     def _broadcast(self, msg:str) -> None:
         encoded_msg = msg.encode()

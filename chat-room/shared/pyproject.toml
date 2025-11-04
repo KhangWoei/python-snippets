@@ -7,6 +7,9 @@ name = "kchat-shared"
 version = "0.1.0"
 requires-python = ">=3.12"
 description = "Shared data transfer objects for kchat client and server"
+dependencies = [
+    "platformdirs"
+]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/message"]
+packages = ["src/message", "src/log_initializer"]

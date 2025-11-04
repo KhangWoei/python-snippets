@@ -2,6 +2,9 @@ from socket import socket, AF_INET, SOCK_STREAM, SHUT_RDWR
 from threading import Thread, Event
 from types import TracebackType
 from typing import Self
+import logging 
+
+logger = logging.getLogger(__name__)
 
 class Client():
 
@@ -13,7 +16,7 @@ class Client():
         return self
 
     def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
-        print("Cleaning up")
+        logger.info("Cleaning up")
         try:
             self._running.clear()
             self._socket.shutdown(SHUT_RDWR)
@@ -32,11 +35,11 @@ class Client():
             
             self._send_loop()
         except KeyboardInterrupt:
-            print("Disconnecting")
+            logger.info("Disconnecting")
         except ConnectionRefusedError:
-            print(f"Failed to connect to {address}:{port}")
+            logger.info(f"Failed to connect to {address}:{port}")
         except OSError as e:
-            print(e)
+            logger.info(e)
 
     def _receive_loop(self) -> None:
         while self._running:

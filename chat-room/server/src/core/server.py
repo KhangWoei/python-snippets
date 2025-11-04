@@ -39,40 +39,41 @@ class Server():
 
 
     def start_server(self) -> None:
-        server: socket = self._socket
-        server.listen()
+        try:
+            server: socket = self._socket
+            server.listen()
+            print(f"Listening on {server.getsockname()}")
+            file_descriptors: DefaultSelector = self._selector
+            file_descriptors.register(server, EVENT_READ)
+            while True:
+                print("Polling ...")
+                events: List[Tuple[SelectorKey, int]]  = file_descriptors.select(1)
 
-        print(f"Listening on {server.getsockname()}")
-        file_descriptors: DefaultSelector = self._selector
-        file_descriptors.register(server, EVENT_READ)
+                for key, _ in events:
+                    if key.fd == server.fileno():
+                        print("Registering client...")
+                        new_client:socket 
+                        addr: str
+                        new_client, addr = server.accept()
+                        self._clients[new_client.fileno()] = Client(new_client, addr)
 
-        while True:
-            print("Polling ...")
-            events: List[Tuple[SelectorKey, int]]  = file_descriptors.select(1)
-
-            for key, _ in events:
-                if key.fd == server.fileno():
-                    print("Registering client...")
-                    new_client:socket 
-                    addr: str
-                    new_client, addr = server.accept()
-                    self._clients[new_client.fileno()] = Client(new_client, addr)
-
-                    file_descriptors.register(new_client, EVENT_READ)
-                else:
-                    print("Client data received...")
-                    current_client: Client = self._clients[key.fd]
-                    data: bytes = current_client.socket.recv(1024)
-
-                    if data:
-                        msg: str = f"[{current_client.address}]: {data}"
-                        print(msg)
-                        self._broadcast(msg)
+                        file_descriptors.register(new_client, EVENT_READ)
                     else:
-                        print("Un-registering client...")
-                        del self._clients[key.fd]
-                        file_descriptors.unregister(current_client.socket)
-                        current_client.socket.close()
+                        print("Client data received...")
+                        current_client: Client = self._clients[key.fd]
+                        data: bytes = current_client.socket.recv(1024)
+
+                        if data:
+                            msg: str = f"[{current_client.address}]: {data}"
+                            print(msg)
+                            self._broadcast(msg)
+                        else:
+                            print("Un-registering client...")
+                            del self._clients[key.fd]
+                            file_descriptors.unregister(current_client.socket)
+                            current_client.socket.close()
+        except KeyboardInterrupt:
+            print("Shutting down")
     
     def _broadcast(self, msg:str) -> None:
         encoded_msg = msg.encode()

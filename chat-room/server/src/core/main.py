@@ -1,10 +1,7 @@
 import configuration.configuration as cfg
 from .server import Server
-from message import message
 
 def main() -> None:
-    message.test()
-
     config = cfg.load()
     print(f"{config.address}:{config.port}")
 

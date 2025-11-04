@@ -31,3 +31,4 @@ class LogInitializer():
             base.info(f"Logging to file: {log_file}")
         except (Exception) as e:
             base.error(f"Failed to setup file logging {e}. Falling back to console logger")
+

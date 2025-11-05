@@ -1,8 +1,8 @@
+from dataclasses import dataclass
+from selectors import DefaultSelector, EVENT_READ, SelectorKey
 from socket import socket, AF_INET, SOCK_STREAM, SHUT_RDWR
 from types import TracebackType
 from typing import Dict, List, Tuple, Self
-from dataclasses import dataclass
-from selectors import DefaultSelector, EVENT_READ, SelectorKey
 import logging
 
 logger = logging.getLogger(__name__)

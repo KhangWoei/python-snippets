@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from kchat_shared.message import Message, MessageType
 from selectors import DefaultSelector, EVENT_READ, SelectorKey
 from socket import socket, AF_INET, SOCK_STREAM, SHUT_RDWR
 from types import TracebackType
@@ -67,14 +68,19 @@ class Server():
                         data: bytes = current_client.socket.recv(1024)
 
                         if data:
-                            msg: str = f"[{current_client.address}]: {data}"
-                            logger.info(msg)
-                            self._broadcast(msg)
+                            message: Message = Message.from_json_string(data.decode())
+                            logger.info(f"Received message: {message}")
+                                                       
+                            if message.type == MessageType.SERVER:
+                                self._broadcast(f"[{message.sender}]: {message.content}")
+                            else:
+                                logger.warn(f"Unimplemented message type {message.type}")
                         else:
                             logger.info("Un-registering client...")
                             del self._clients[key.fd]
                             file_descriptors.unregister(current_client.socket)
                             current_client.socket.close()
+
         except KeyboardInterrupt:
             logger.info("Shutting down")
     

@@ -1,5 +1,5 @@
-from log_initializer import log_initializer
+from log_initializer import LogInitializer
 import logging
 
-log_initializer.LogInitializer.init(__package__, logging.INFO)
+LogInitializer.init(__package__, logging.INFO)
 

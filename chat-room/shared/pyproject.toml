@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/message", "src/log_initializer"]
+packages = ["src/kchat_shared"]
 
 [tool.hatch.envs.test]
 template = "default"

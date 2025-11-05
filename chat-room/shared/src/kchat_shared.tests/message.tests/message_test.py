@@ -1,4 +1,4 @@
-from message import message
+import kchat_shared.message as message
 from json import dumps, loads
 
 def test_roundtrip():

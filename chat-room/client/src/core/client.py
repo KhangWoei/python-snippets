@@ -2,6 +2,7 @@ from socket import socket, AF_INET, SOCK_STREAM, SHUT_RDWR
 from threading import Thread, Event
 from types import TracebackType
 from typing import Self
+from kchat_shared.message import Message, MessageType
 import logging 
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,8 @@ class Client():
  
     def _send_loop(self) -> None:
         while self._running:
-            message: str = input("> ")
-            self._socket.send((message).encode())
+            content: str = input("> ")
+
+            message: Message = Message(MessageType.SERVER, self._socket.getsockname(), None, content)
+            self._socket.send(message.to_json_string().encode())
 

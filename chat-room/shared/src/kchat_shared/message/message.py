@@ -1,7 +1,10 @@
 import dataclasses
 from enum import Enum
-from json import JSONEncoder, JSONDecoder
-from typing import Any, Dict
+from json import JSONEncoder, JSONDecoder, dumps, loads
+from typing import Any, Dict, Self
+import logging
+
+logger = logging.getLogger(__name__)
 
 class MessageType(Enum):
     SERVER = 1
@@ -15,6 +18,25 @@ class Message():
     recipient: str | None;
     content: str;
 
+    def to_json_string(self) -> str:
+        return dumps(self, cls=ExtendedEncoder)
+
+    """ Consider using @classmethod. 
+        Unlike @staticmethod, class methods take the class type as it's first input, good candidate for implementing creation or factory patterns or even parsing like this one.
+    """
+    @classmethod
+    def from_json_string(cls, input: str) -> Self:
+        data: Dict[str, Any] = loads(input)
+
+        if "type" not in data or "sender" not in data or "content" not in data:
+            error: TypeError = TypeError(f"Unable to parse: {input} to {cls}")
+            logger.error(error)
+            raise error
+
+        data["type"] = MessageType(data["type"])
+
+        return cls(**data)
+
 class ExtendedEncoder(JSONEncoder):
     """ Whenever the encoder hits an unknown datatype, 
         it'll interrogate the default method for 
@@ -24,31 +46,10 @@ class ExtendedEncoder(JSONEncoder):
     def default(self, o: Any) -> Any:
         if dataclasses.is_dataclass(o):
             data: Dict[str, Any] = dataclasses.asdict(o)
-            data["__type__"] = o.__class__.__name__
             return data
 
         if isinstance(o, Enum):
-            return o.name
+            return o.value
 
         return super().default(o)
-
-class ExtendedDecoder(JSONDecoder):
-
-    _type_map: Dict[str, type] = {
-        Message.__name__: Message
-    }
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(object_hook=self._hook, *args, **kwargs)
-
-    def _hook(self, dct: Dict[str, Any]) -> Any:
-        type_attribute: str | None = dct.pop("__type__") if "__type__" in dct else None
-
-        if type_attribute is not None:
-            decoded_type: object | None = self._type_map.get(type_attribute)
-
-            if decoded_type is not None:
-                return decoded_type(**dct)
-        
-        return dct
 
